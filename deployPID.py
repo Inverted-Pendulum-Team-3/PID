@@ -59,7 +59,7 @@ K_YAW_HOLD    =  1.0   # heading-hold proportional gain
 K_YAW_RATE    =  0.2   # yaw-rate damping gain
 YAW_CMD_MAX   =  1.0
 
-PITCH_TIP_LIMIT = math.radians(70)  # cut motors beyond ±70°
+PITCH_TIP_LIMIT = math.radians(35)  # cut motors beyond ±70°
 
 CONTROL_HZ = 100
 target_dt  = 1.0 / CONTROL_HZ
@@ -88,17 +88,6 @@ def wrap_angle(a):
         a += 2.0 * math.pi
     return a
 
-
-def tilt_based_max_power(pitch_rad: float) -> float:
-    """Gradually limit motor power near level to prevent overshoot on small corrections."""
-    pitch_deg = abs(math.degrees(pitch_rad))
-    if pitch_deg <= 3.0:
-        return 0.25
-    if pitch_deg <= 8.0:
-        return 0.55
-    if pitch_deg <= 15.0:
-        return 0.85
-    return 1.0
 
 
 # ---------------------------------------------------------------------------
@@ -162,6 +151,9 @@ def main():
             wheel_left_vel  = float(obs[4])
             wheel_right_vel = float(obs[5])
             yaw             = float(obs[8])   # absolute yaw from IMU quaternion (rad)
+            #DELETE LATER
+            wheel_right_vel *= 1.6
+            wheel_left_vel = -wheel_right_vel
 
             # ------------------------------------------------------------------
             # 2. Ramp drive_fwd toward target
@@ -246,11 +238,6 @@ def main():
             # ------------------------------------------------------------------
             left_cmd  = clamp(wheel_avg_cmd - yaw_cmd, -WHEEL_CMD_MAX, WHEEL_CMD_MAX) / WHEEL_CMD_MAX
             right_cmd = clamp(wheel_avg_cmd + yaw_cmd, -WHEEL_CMD_MAX, WHEEL_CMD_MAX) / WHEEL_CMD_MAX
-
-            # Tilt-based power cap: reduce max output near level to prevent overshoot
-            max_pwr   = tilt_based_max_power(pitch)
-            left_cmd  = clamp(left_cmd,  -max_pwr, max_pwr)
-            right_cmd = clamp(right_cmd, -max_pwr, max_pwr)
 
             set_motor_velocities(left_cmd, right_cmd)
 
