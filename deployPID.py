@@ -41,8 +41,8 @@ from hardware_interface import (
 # ---------------------------------------------------------------------------
 # PID / control gains (from DeployPID_NEW.py — tune these on hardware)
 # ---------------------------------------------------------------------------
-KP_PITCH      = 50.0
-KD_PITCH      =  8.0
+KP_PITCH      = 80.0
+KD_PITCH      =  10.0
 KI_PITCH      =  0.0
 I_PITCH_MAX   =  2.0
 WHEEL_CMD_MAX = 12.8   # internal command range before normalising to ±1
@@ -59,7 +59,7 @@ K_YAW_HOLD    =  1.0   # heading-hold proportional gain
 K_YAW_RATE    =  0.2   # yaw-rate damping gain
 YAW_CMD_MAX   =  1.0
 
-PITCH_TIP_LIMIT = math.radians(35)  # cut motors beyond ±70°
+PITCH_TIP_LIMIT = math.radians(35)  # cut motors beyond ±35°
 
 CONTROL_HZ = 100
 target_dt  = 1.0 / CONTROL_HZ
